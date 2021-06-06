@@ -135,13 +135,8 @@ define Device/ampedwireless_ally_common
   BLOCKSIZE := 128k
   PAGESIZE := 2048
   UBINIZE_OPTS := -E 5
-<<<<<<< HEAD
-  KERNEL := kernel-bin | append-dtb | lzma -d16 | uImage lzma
-  KERNEL_INITRAMFS := kernel-bin | append-dtb | lzma -d16 | uImage lzma -n 'flashable-initramfs' |\
-=======
-  KERNEL := kernel-bin | append-dtb | lzma -d18 | uImage lzma
-  KERNEL_INITRAMFS := kernel-bin | append-dtb | lzma -d18 | uImage lzma -n 'flashable-initramfs' |\
->>>>>>> 83130be3f0... fix kernel targets to reduce LZMA dictionary size
+  KERNEL := kernel-bin | append-dtb | lzma -d17 | uImage lzma
+  KERNEL_INITRAMFS := kernel-bin | append-dtb | lzma -d17 | uImage lzma -n 'flashable-initramfs' |\
 	edimax-header -s CSYS -m RN68 -f 0x001c0000 -S 0x01100000
   IMAGE/sysupgrade.bin := sysupgrade-tar | append-metadata
 endef
