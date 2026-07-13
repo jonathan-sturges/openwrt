@@ -1,0 +1,242 @@
+// SPDX-License-Identifier: (GPL-2.0 OR MIT)
+
+/dts-v1/;
+#include "mt7981b.dtsi"
+/ {
+	model = "ASUS RT-AX57 Go";
+	compatible = "asus,rt-ax57_go", "mediatek,mt7981";
+	interrupt-parent = <0x01>;
+
+	aliases {
+		serial0 = &uart0;
+		label-mac-device = &gmac0;
+		led-boot = &led2;
+		led-failsafe = &led2;
+		led-running = &led2;
+		led-upgrade = &led2;
+	};
+
+	chosen {
+		stdout-path = "serial0:115200n8";
+		bootargs-override = "";
+	};
+
+	memory@40000000 {
+		reg = <0 0x40000000 0 0x20000000>;
+		device_type = "memory";
+	};
+
+	keys {
+		compatible = "gpio-keys";
+
+		reset {
+			label = "reset";
+			gpios = <&pio 1 GPIO_ACTIVE_LOW>;
+			linux,code = <KEY_RESTART>;
+		};
+
+		wps {
+			label = "wps";
+			gpios = <&pio 0 GPIO_ACTIVE_LOW>;
+			linux,code = <KEY_WPS_BUTTON>;
+		};
+	};
+
+	leds {
+		compatible = "gpio-leds";
+
+		led2: power {
+			function = LED_FUNCTION_POWER;
+			color = <LED_COLOR_ID_BLUE>;
+			gpios = <&pio 4 GPIO_ACTIVE_HIGH>;
+			default-state = "on";
+		};
+
+		lan {
+			function = LED_FUNCTION_LAN;
+			color = <LED_COLOR_ID_BLUE>;
+			gpios = <&pio 7 GPIO_ACTIVE_LOW>;
+		};
+
+	};
+
+	timer {
+		clock-frequency = <13000000>;
+	};
+};
+
+&uart0 {
+	status = "okay";
+};
+
+&eth {
+	#reset-cells = <0x01>;
+	status = "okay";
+
+	gmac0: mac@0 {
+		/* LAN */
+		compatible = "mediatek,eth-mac";
+		reg = <0>;
+		nvmem-cells = <&macaddr_factory_4>;
+		nvmem-cell-names = "mac-address";
+		phy-mode = "sgmii";
+		phy-handle = <0x14>;
+	};
+
+	gmac1: mac@1 {
+		/* WAN */
+		compatible = "mediatek,eth-mac";
+		reg = <1>;
+		phy-mode = "gmii";
+		phy-handle = <0x15>;
+	};
+
+	mdio-bus {
+		#address-cells = <0x01>;
+		#size-cells = <0x00>;
+
+		phy0: ethernet-phy@0 {
+			compatible = "ethernet-phy-id03a2.9461";
+			reg = <0x00>;
+			phy-mode = "gmii";
+			nvmem-cells = <0x16>;
+			nvmem-cell-names = "phy-cal-data";
+			phandle = <0x15>;
+		};
+
+		phy1: ethernet-phy@5 {
+			compatible = "ethernet-phy-id03a2.9471";
+			reg = <0x18>;
+			reset-gpios = <&pio 39 1>;
+			reset-assert-us = <0x258>;
+			reset-deassert-us = <0x4e20>;
+			phy-mode = "sgmii";
+			full-duplex;
+			pause;
+			phandle = <0x14>;
+		};
+	};
+
+	
+};
+
+&spi0 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&spi0_flash_pins>;
+	status = "okay";
+
+	spi_nand_flash: flash@0 {
+		compatible = "u-boot-dont-touch-spi-nand";
+		#address-cells = <1>;
+		#size-cells = <1>;
+		reg = <0>;
+
+		spi-max-frequency = <52000000>;
+		spi-tx-bus-width = <4>;
+		spi-rx-bus-width = <4>;
+
+		/*
+		 * ASUS bootloader tries to replace the partitions defined in
+		 * Device Tree and by that also deletes all additional properties
+		 * needed for UBI and NVMEM-on-UBI.
+		 * Prevent this from happening by tricking the loader to delete and
+		 * replace a bait node instead (works with older bootloaders).
+		 */
+		partitions: dummy {
+			compatible = "u-boot-dummy-partitions";
+			#address-cells = <1>;
+			#size-cells = <1>;
+
+			partition@0 {
+				reg = <0x0 0x0>;
+				label = "remove_me";
+			};
+		};
+
+		partitions {
+			compatible = "fixed-partitions";
+			#address-cells = <1>;
+			#size-cells = <1>;
+
+			partition@0 {
+				reg = <0x0 0x400000>;
+				label = "bootloader";
+				read-only;
+			};
+
+			partition@400000 {
+				compatible = "linux,ubi";
+				reg = <0x400000 0x7c00000>;
+				label = "UBI_DEV";
+
+				volumes {
+					ubi_factory: ubi-volume-factory {
+						volname = "Factory";
+					};
+				};
+			};
+		};
+	};
+};
+
+&ubi_factory {
+	nvmem-layout {
+		compatible = "fixed-layout";
+		#address-cells = <1>;
+		#size-cells = <1>;
+
+		eeprom_factory_0: eeprom@0 {
+			reg = <0x0 0x1000>;
+		};
+
+		macaddr_factory_4: macaddr@4 {
+			reg = <0x4 0x6>;
+		};
+
+		precal_factory_1010: precal@1010 {
+			reg = <0x1010 0x6f010>;
+		};
+	};
+};
+
+&usb_phy {
+	status = "okay";
+};
+
+&xhci {
+	status = "okay";
+};
+
+&pio {
+	spi0_flash_pins: spi0-pins {
+		phandle = <0x17>;
+
+		mux {
+			function = "spi";
+			groups = "spi0", "spi0_wp_hold";
+		};
+
+		conf-pu {
+			pins = "SPI0_CS", "SPI0_HOLD", "SPI0_WP";
+			drive-strength = <MTK_DRIVE_8mA>;
+			bias-pull-up = <MTK_PUPD_SET_R1R0_11>;
+		};
+
+		conf-pd {
+			pins = "SPI0_CLK", "SPI0_MOSI", "SPI0_MISO";
+			drive-strength = <MTK_DRIVE_8mA>;
+			bias-pull-down = <MTK_PUPD_SET_R1R0_11>;
+		};
+	};
+};
+
+&watchdog {
+	status = "okay";
+};
+
+&wifi {
+	nvmem-cells = <&eeprom_factory_0>, <&precal_factory_1010>;
+	nvmem-cell-names = "eeprom", "precal";
+
+	status = "okay";
+};
