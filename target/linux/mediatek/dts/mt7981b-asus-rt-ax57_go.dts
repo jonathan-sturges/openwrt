@@ -79,7 +79,6 @@
 		reg = <0>;
 		nvmem-cells = <&macaddr_factory_4>;
 		nvmem-cell-names = "mac-address";
-		phy-mode = "sgmii";
 		phy-handle = <0x14>;
 	};
 
@@ -104,15 +103,13 @@
 			phandle = <0x15>;
 		};
 
-		phy1: ethernet-phy@5 {
+		en8801sc: ethernet-phy@24 {
 			compatible = "ethernet-phy-id03a2.9471";
-			reg = <0x18>;
-			reset-gpios = <&pio 39 1>;
-			reset-assert-us = <0x258>;
-			reset-deassert-us = <0x4e20>;
+			reg = <24>;
 			phy-mode = "sgmii";
-			full-duplex;
-			pause;
+			reset-gpios = <&pio 39 GPIO_ACTIVE_LOW>;
+			reset-assert-us = <10000>;
+			reset-deassert-us = <20000>;
 			phandle = <0x14>;
 		};
 	};
