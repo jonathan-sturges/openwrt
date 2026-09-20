@@ -490,12 +490,12 @@ endif
 endef
 TARGET_DEVICES += asus_rt-ax57m
 
-define Device/asus_rt-ax57_go
+define Device/asus_rt-ax57go
   DEVICE_VENDOR := ASUS
   DEVICE_MODEL := RT-AX57_GO
-  DEVICE_DTS := mt7981b-asus-rt-ax57_go
+  DEVICE_DTS := mt7981b-asus-rt-ax57go
   DEVICE_DTS_DIR := ../dts
-  DEVICE_PACKAGES := kmod-mt7981-firmware mt7981-wo-firmware
+  DEVICE_PACKAGES := kmod-usb3 kmod-mt7915e kmod-mt7981-firmware mt7981-wo-firmware
   IMAGES := sysupgrade.bin
   KERNEL_INITRAMFS := kernel-bin | lzma | \
 	fit lzma $$(KDIR)/image-$$(firstword $$(DEVICE_DTS)).dtb with-initrd | pad-to 64k
@@ -506,7 +506,7 @@ ifeq ($(IB),)
 	uImage none | asus-trx -v 3 -n P$$(DEVICE_MODEL)
 endif
 endef
-TARGET_DEVICES += asus_rt-ax57_go
+TARGET_DEVICES += asus_rt-ax57go
 
 define Device/asus_rt-ax59u
   DEVICE_VENDOR := ASUS

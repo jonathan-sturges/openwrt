@@ -4,16 +4,16 @@
 #include "mt7981b.dtsi"
 / {
 	model = "ASUS RT-AX57 Go";
-	compatible = "asus,rt-ax57_go", "mediatek,mt7981";
+	compatible = "asus,rt-ax57go", "mediatek,mt7981";
 	interrupt-parent = <0x01>;
 
 	aliases {
 		serial0 = &uart0;
 		label-mac-device = &gmac0;
-		led-boot = &led2;
-		led-failsafe = &led2;
-		led-running = &led2;
-		led-upgrade = &led2;
+		led-boot = &led2_white;
+		led-failsafe = &led2_red;
+		led-running = &led1_green;
+		led-upgrade = &led2_red;
 	};
 
 	chosen {
@@ -35,27 +35,35 @@
 			linux,code = <KEY_RESTART>;
 		};
 
-		wps {
-			label = "wps";
-			gpios = <&pio 0 GPIO_ACTIVE_LOW>;
-			linux,code = <KEY_WPS_BUTTON>;
+		vpn_switch {
+			label = "vpn_switch";
+			gpios = <&pio 7 GPIO_ACTIVE_LOW>;
+			linux,input-type = <EV_SW>;
 		};
 	};
 
 	leds {
 		compatible = "gpio-leds";
 
-		led2: power {
-			function = LED_FUNCTION_POWER;
-			color = <LED_COLOR_ID_BLUE>;
-			gpios = <&pio 4 GPIO_ACTIVE_HIGH>;
-			default-state = "on";
+		led2_white: status_white {
+			function = LED_FUNCTION_STATUS;
+			color = <LED_COLOR_ID_WHITE>;
+			gpios = <&pio 4 GPIO_ACTIVE_LOW>;
+			default-state = "off";
 		};
 
-		lan {
-			function = LED_FUNCTION_LAN;
-			color = <LED_COLOR_ID_BLUE>;
-			gpios = <&pio 7 GPIO_ACTIVE_LOW>;
+		led2_red: status_red {
+			function = LED_FUNCTION_STATUS;
+			color = <LED_COLOR_ID_RED>;
+			gpios = <&pio 13 GPIO_ACTIVE_LOW>;
+			default-state = "off";
+		};
+
+		led1_green: status_green {
+			function = LED_FUNCTION_POWER;
+			color = <LED_COLOR_ID_GREEN>;
+			gpios = <&pio 14 GPIO_ACTIVE_LOW>;
+			default-state = "on";
 		};
 
 	};
@@ -77,9 +85,11 @@
 		/* LAN */
 		compatible = "mediatek,eth-mac";
 		reg = <0>;
+		phy-mode = "sgmii";
 		nvmem-cells = <&macaddr_factory_4>;
 		nvmem-cell-names = "mac-address";
-		phy-handle = <0x14>;
+		phy-handle = <&en8801sc>;
+		managed = "in-band-status";
 	};
 
 	gmac1: mac@1 {
@@ -87,7 +97,7 @@
 		compatible = "mediatek,eth-mac";
 		reg = <1>;
 		phy-mode = "gmii";
-		phy-handle = <0x15>;
+		phy-handle = <&phy0>;
 	};
 
 	mdio-bus {
@@ -98,9 +108,8 @@
 			compatible = "ethernet-phy-id03a2.9461";
 			reg = <0x00>;
 			phy-mode = "gmii";
-			nvmem-cells = <0x16>;
+			nvmem-cells = <&precal_factory_1010>; 
 			nvmem-cell-names = "phy-cal-data";
-			phandle = <0x15>;
 		};
 
 		en8801sc: ethernet-phy@24 {
@@ -108,13 +117,10 @@
 			reg = <24>;
 			phy-mode = "sgmii";
 			reset-gpios = <&pio 39 GPIO_ACTIVE_LOW>;
-			reset-assert-us = <10000>;
-			reset-deassert-us = <20000>;
-			phandle = <0x14>;
+			reset-assert-us = <20000>;
+			reset-deassert-us = <50000>;
 		};
 	};
-
-	
 };
 
 &spi0 {
