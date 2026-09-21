@@ -277,7 +277,7 @@ platform_do_upgrade() {
 		;;
 	asus,rt-ax52|\
 	asus,rt-ax57m|\
-	asus,rt-ax57_go|\
+	asus,rt-ax57go|\
 	asus,rt-ax59u|\
 	asus,tuf-ax4200|\
 	asus,tuf-ax4200q|\
@@ -545,7 +545,7 @@ platform_pre_upgrade() {
 	case "$board" in
 	asus,rt-ax52|\
 	asus,rt-ax57m|\
-	asus,rt-ax57_go|\
+	asus,rt-ax57go|\
 	asus,rt-ax59u|\
 	asus,tuf-ax4200|\
 	asus,tuf-ax4200q|\
