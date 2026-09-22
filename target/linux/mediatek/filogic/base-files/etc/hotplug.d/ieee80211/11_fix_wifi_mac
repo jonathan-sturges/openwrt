@@ -49,6 +49,7 @@ case "$board" in
 			/sys${DEVPATH}/macaddress
 		;;
 	asus,rt-ax52|\
+	asus,rt-ax57go|\
 	asus,rt-ax57m|\
 	asus,tuf-ax4200|\
 	asus,tuf-ax4200q|\
