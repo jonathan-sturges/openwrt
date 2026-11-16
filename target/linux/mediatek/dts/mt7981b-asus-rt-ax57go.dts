@@ -71,6 +71,19 @@
 			default-state = "on";
 		};
 
+		/*
+		 * Third channel of the red/green/blue status LED. Stock firmware
+		 * drives red/green/blue as PWM0/PWM1/PWM2 (nvram led_red_gpio,
+		 * led_green_gpio, led_blue_gpio = 0x10c8/0x10c9/0x10ca) with the
+		 * pwm0_0/pwm1_0/pwm2 pin groups, i.e. GPIO 13/14/7.
+		 */
+		led1_blue: status_blue {
+			function = LED_FUNCTION_STATUS;
+			color = <LED_COLOR_ID_BLUE>;
+			gpios = <&pio 7 GPIO_ACTIVE_LOW>;
+			default-state = "off";
+		};
+
 	};
 
 	timer {
