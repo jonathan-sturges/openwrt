@@ -42,6 +42,7 @@
 		vpn_switch {
 			label = "vpn_switch";
 			gpios = <&pio 0 GPIO_ACTIVE_HIGH>;
+			linux,code = <BTN_0>;
 			linux,input-type = <EV_SW>;
 		};
 	};
@@ -112,8 +113,6 @@
 			compatible = "ethernet-phy-id03a2.9461";
 			reg = <0>;
 			phy-mode = "gmii";
-			nvmem-cells = <&precal_factory_1010>;
-			nvmem-cell-names = "phy-cal-data";
 		};
 
 		en8801sc: ethernet-phy@24 {

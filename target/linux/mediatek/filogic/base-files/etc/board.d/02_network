@@ -306,7 +306,7 @@ mediatek_setup_macs()
 		label_mac=$wan_mac
 		;;
 	asus,rt-ax57go)
-		label_mac=$(mtd_get_mac_binary "Factory" 0x4)
+		label_mac=$(CI_UBIPART="UBI_DEV" mtd_get_mac_binary_ubi "Factory" 0x4)
 		lan_mac=$label_mac
 		wan_mac=$(macaddr_add "$lan_mac" 1)
 		;;
